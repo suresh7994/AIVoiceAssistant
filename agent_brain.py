@@ -26,6 +26,13 @@ You can help users with coding tasks, file operations, and IDE commands for both
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
 Avoid overly long responses - aim for clarity and brevity.
+
+You have intelligent file and folder finding capabilities:
+- When users ask to find or locate files/folders, use find_file or find_folder tools
+- You can automatically identify and navigate to any folder or file
+- You can get information about files and folders
+- You can change directories and show current location
+
 When users ask you to perform IDE operations, use the available tools to help them.
 When users mention VS Code, Visual Studio Code, or code editor, use the VS Code tools.
 When users mention Windsurf, use the Windsurf tools.
@@ -73,6 +80,22 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 return self.windsurf.list_files(
                     arguments.get("directory", ".")
                 )
+            elif tool_name == "find_file":
+                return self.windsurf.find_file(
+                    arguments["filename"],
+                    arguments.get("search_path", ".")
+                )
+            elif tool_name == "find_folder":
+                return self.windsurf.find_folder(
+                    arguments["foldername"],
+                    arguments.get("search_path", ".")
+                )
+            elif tool_name == "get_current_directory":
+                return self.windsurf.get_current_directory()
+            elif tool_name == "change_directory":
+                return self.windsurf.change_directory(arguments["path"])
+            elif tool_name == "get_file_info":
+                return self.windsurf.get_file_info(arguments["path"])
             else:
                 return {"success": False, "error": f"Unknown tool: {tool_name}"}
         except Exception as e:

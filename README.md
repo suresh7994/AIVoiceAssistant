@@ -15,6 +15,12 @@ Production-ready personal voice AI assistant named **Surya** with wake word acti
   - Search in files
   - Execute terminal commands
   - List directory contents
+- **Intelligent File Navigation**: Automatically find and navigate files/folders
+  - Find files by name anywhere in the project
+  - Locate folders automatically
+  - Get current directory and file information
+  - Navigate to any folder with voice commands
+  - List contents of any directory
 - **Modern UI**: Clean PyQt5 interface with visual feedback
 - **Graceful Exit**: Say "bye" or "exit" to close the application
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
@@ -149,12 +155,23 @@ The assistant now has full access to both Windsurf IDE and VS Code operations th
 - "List all files in the project"
 - "Run the command 'git status'"
 
+**File Navigation:**
+- "Find the file agent_brain"
+- "Where is the tests folder?"
+- "What's in the current directory?"
+- "Go to the src folder"
+- "Tell me about main.py"
+- "main.py फाइल ढूंढो"
+- "मैं कहां हूं?"
+
 **Exit:**
 - "Bye" / "Goodbye"
 - "Exit" / "Quit"
 - "बाय" / "गुडबाय" / "बंद करो" / "शट डाउन"
 
-For detailed information, see [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md)
+For detailed information:
+- IDE Control: [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md) and [VSCODE_INTEGRATION.md](VSCODE_INTEGRATION.md)
+- File Navigation: [FILE_NAVIGATION_GUIDE.md](FILE_NAVIGATION_GUIDE.md)
 
 ## Troubleshooting
 

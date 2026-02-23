@@ -109,18 +109,122 @@ class WindsurfController:
             return {"success": False, "error": str(e)}
     
     def list_files(self, directory: str = ".") -> Dict[str, Any]:
-        """List files in a directory"""
+        """List files and directories"""
         try:
-            result = subprocess.run(
-                ["ls", "-la", directory],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            import os
+            items = os.listdir(directory)
             return {
                 "success": True,
-                "files": result.stdout
+                "files": [f for f in items if os.path.isfile(os.path.join(directory, f))],
+                "directories": [d for d in items if os.path.isdir(os.path.join(directory, d))]
             }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def find_file(self, filename: str, search_path: str = ".") -> Dict[str, Any]:
+        """Find a file by name in the given path and subdirectories"""
+        try:
+            import os
+            matches = []
+            for root, dirs, files in os.walk(search_path):
+                for file in files:
+                    if filename.lower() in file.lower():
+                        full_path = os.path.join(root, file)
+                        matches.append(full_path)
+            
+            if matches:
+                return {
+                    "success": True,
+                    "message": f"Found {len(matches)} file(s)",
+                    "files": matches
+                }
+            else:
+                return {
+                    "success": False,
+                    "message": f"No files found matching '{filename}'"
+                }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def find_folder(self, foldername: str, search_path: str = ".") -> Dict[str, Any]:
+        """Find a folder by name in the given path and subdirectories"""
+        try:
+            import os
+            matches = []
+            for root, dirs, files in os.walk(search_path):
+                for dir_name in dirs:
+                    if foldername.lower() in dir_name.lower():
+                        full_path = os.path.join(root, dir_name)
+                        matches.append(full_path)
+            
+            if matches:
+                return {
+                    "success": True,
+                    "message": f"Found {len(matches)} folder(s)",
+                    "folders": matches
+                }
+            else:
+                return {
+                    "success": False,
+                    "message": f"No folders found matching '{foldername}'"
+                }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def get_current_directory(self) -> Dict[str, Any]:
+        """Get the current working directory"""
+        try:
+            import os
+            cwd = os.getcwd()
+            return {
+                "success": True,
+                "directory": cwd,
+                "message": f"Current directory: {cwd}"
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def change_directory(self, path: str) -> Dict[str, Any]:
+        """Change the current working directory"""
+        try:
+            import os
+            os.chdir(path)
+            new_cwd = os.getcwd()
+            return {
+                "success": True,
+                "directory": new_cwd,
+                "message": f"Changed to directory: {new_cwd}"
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def get_file_info(self, path: str) -> Dict[str, Any]:
+        """Get information about a file or folder"""
+        try:
+            import os
+            from datetime import datetime
+            
+            if not os.path.exists(path):
+                return {"success": False, "error": f"Path does not exist: {path}"}
+            
+            stat_info = os.stat(path)
+            is_file = os.path.isfile(path)
+            is_dir = os.path.isdir(path)
+            
+            info = {
+                "success": True,
+                "path": path,
+                "type": "file" if is_file else "directory",
+                "size": stat_info.st_size if is_file else None,
+                "modified": datetime.fromtimestamp(stat_info.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
+                "created": datetime.fromtimestamp(stat_info.st_ctime).strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+            if is_dir:
+                items = os.listdir(path)
+                info["item_count"] = len(items)
+            
+            return info
         except Exception as e:
             return {"success": False, "error": str(e)}
     
@@ -458,6 +562,94 @@ WINDSURF_TOOLS = [
                     }
                 },
                 "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "find_file",
+            "description": "Find a file by name in the current directory and subdirectories. Use this when user asks to find, locate, or search for a specific file.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "description": "The name or partial name of the file to find"
+                    },
+                    "search_path": {
+                        "type": "string",
+                        "description": "The path to start searching from (default: current directory)"
+                    }
+                },
+                "required": ["filename"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "find_folder",
+            "description": "Find a folder/directory by name in the current directory and subdirectories. Use this when user asks to find, locate, or search for a specific folder.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "foldername": {
+                        "type": "string",
+                        "description": "The name or partial name of the folder to find"
+                    },
+                    "search_path": {
+                        "type": "string",
+                        "description": "The path to start searching from (default: current directory)"
+                    }
+                },
+                "required": ["foldername"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_directory",
+            "description": "Get the current working directory path. Use this when user asks where they are or what the current folder is.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "change_directory",
+            "description": "Change the current working directory. Use this when user wants to navigate to a different folder.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "The path to change to"
+                    }
+                },
+                "required": ["path"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_file_info",
+            "description": "Get detailed information about a file or folder (size, type, modification date, etc.). Use this when user asks about file/folder details.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "The path to the file or folder"
+                    }
+                },
+                "required": ["path"]
             }
         }
     }
