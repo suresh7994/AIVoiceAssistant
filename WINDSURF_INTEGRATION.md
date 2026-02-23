@@ -1,5 +1,9 @@
 # Windsurf IDE Integration
 
+This voice assistant can control Windsurf IDE and VS Code through voice commands.
+
+> **Note:** For VS Code specific documentation, see [VSCODE_INTEGRATION.md](VSCODE_INTEGRATION.md)
+
 Your voice assistant now has full access to Windsurf IDE operations! You can control the IDE using voice commands in Hindi.
 
 ## Available Commands

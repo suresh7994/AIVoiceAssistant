@@ -21,12 +21,14 @@ class AgentBrain:
         self.max_history = 20
         self.windsurf = WindsurfController()
         
-        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to Windsurf IDE.
-You can help users with coding tasks, file operations, and IDE commands.
+        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to Windsurf IDE and VS Code.
+You can help users with coding tasks, file operations, and IDE commands for both Windsurf and Visual Studio Code.
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
 Avoid overly long responses - aim for clarity and brevity.
 When users ask you to perform IDE operations, use the available tools to help them.
+When users mention VS Code, Visual Studio Code, or code editor, use the VS Code tools.
+When users mention Windsurf, use the Windsurf tools.
 Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'."""
         
         self.conversation_history.append({
@@ -35,9 +37,15 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
         })
     
     def _execute_tool(self, tool_name: str, arguments: Dict) -> Dict:
-        """Execute a Windsurf tool function"""
+        """Execute a Windsurf or VS Code tool function"""
         try:
-            if tool_name == "open_file":
+            if tool_name == "open_windsurf":
+                return self.windsurf.open_windsurf(arguments.get("path"))
+            elif tool_name == "open_vscode":
+                return self.windsurf.open_vscode(arguments.get("path"))
+            elif tool_name == "open_file_vscode":
+                return self.windsurf.open_file_vscode(arguments["file_path"])
+            elif tool_name == "open_file":
                 return self.windsurf.open_file(arguments["file_path"])
             elif tool_name == "create_file":
                 return self.windsurf.create_file(

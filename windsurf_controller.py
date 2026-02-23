@@ -8,11 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 class WindsurfController:
-    """Controller for executing Windsurf IDE operations via CLI"""
+    """Controller for executing Windsurf IDE and VS Code operations via CLI"""
     
     def __init__(self):
         self.windsurf_cli = "windsurf"
         self.windsurf_app_name = "Windsurf"
+        self.vscode_cli = "code"
+        self.vscode_app_name = "Visual Studio Code"
     
     def execute_command(self, command: str, args: Optional[list] = None) -> Dict[str, Any]:
         """Execute a Windsurf CLI command"""
@@ -187,6 +189,88 @@ class WindsurfController:
                     return {"success": False, "error": result.stderr or "Failed to launch Windsurf"}
         except Exception as e:
             return {"success": False, "error": str(e)}
+    
+    def is_vscode_running(self) -> bool:
+        """Check if VS Code is currently running"""
+        try:
+            result = subprocess.run(
+                ["pgrep", "-f", "Visual Studio Code"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            return result.returncode == 0 and bool(result.stdout.strip())
+        except Exception as e:
+            logger.error(f"Error checking if VS Code is running: {e}")
+            return False
+    
+    def open_vscode(self, path: Optional[str] = None) -> Dict[str, Any]:
+        """Open VS Code, optionally with a specific path"""
+        try:
+            if self.is_vscode_running():
+                message = "VS Code is already running"
+                logger.info(message)
+                
+                # If path provided, try to open it
+                if path:
+                    result = subprocess.run(
+                        ["open", "-a", self.vscode_app_name, path],
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    if result.returncode == 0:
+                        return {"success": True, "message": f"Opened {path} in VS Code"}
+                    else:
+                        return {"success": False, "error": result.stderr}
+                else:
+                    # Just bring VS Code to front
+                    subprocess.run(
+                        ["open", "-a", self.vscode_app_name],
+                        capture_output=True,
+                        timeout=5
+                    )
+                    return {"success": True, "message": message}
+            else:
+                # Launch VS Code
+                logger.info("Launching VS Code...")
+                if path:
+                    result = subprocess.run(
+                        ["open", "-a", self.vscode_app_name, path],
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                else:
+                    result = subprocess.run(
+                        ["open", "-a", self.vscode_app_name],
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                
+                if result.returncode == 0:
+                    return {"success": True, "message": "VS Code launched successfully"}
+                else:
+                    return {"success": False, "error": result.stderr or "Failed to launch VS Code"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def open_file_vscode(self, file_path: str) -> Dict[str, Any]:
+        """Open a file in VS Code using CLI"""
+        try:
+            result = subprocess.run(
+                [self.vscode_cli, file_path],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                return {"success": True, "message": f"Opened {file_path} in VS Code"}
+            else:
+                return {"success": False, "error": result.stderr or "Failed to open file"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
 
 # Tool definitions for OpenAI function calling
@@ -205,6 +289,40 @@ WINDSURF_TOOLS = [
                     }
                 },
                 "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "open_vscode",
+            "description": "Open or launch VS Code (Visual Studio Code). Use this when user wants to open VS Code, Visual Studio Code, or code editor.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Optional path to open in VS Code (file or directory)"
+                    }
+                },
+                "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "open_file_vscode",
+            "description": "Open a specific file in VS Code using the code CLI",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "The path to the file to open in VS Code"
+                    }
+                },
+                "required": ["file_path"]
             }
         }
     },

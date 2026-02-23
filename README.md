@@ -5,13 +5,19 @@ Production-ready personal voice AI assistant named **Surya** with wake word acti
 ## Features
 
 - **Wake Word Activation**: Say "Hello Surya" or "Hi Surya" to activate the assistant
-- **Speech-to-Text**: Real-time microphone input processing with Hindi (hi-IN) support
-- **Text-to-Speech**: Natural AI voice output with Hindi female voice (Lekha)
-- **OpenAI Integration**: Streaming responses for low latency
-- **Conversational Memory**: Short-term context retention (20 messages)
-- **Modern UI**: Dark mode with animated waveforms (listening/speaking states)
+- **Hindi Language Support**: Full support for Hindi speech-to-text and text-to-speech
+- **Voice-to-Voice Interaction**: Speak naturally and get voice responses
+- **OpenAI Integration**: Powered by GPT models for intelligent responses
+- **IDE Control**: Voice commands to control both Windsurf IDE and VS Code
+  - **Windsurf IDE**: Open, manage files, and execute commands
+  - **VS Code**: Launch, open files, and manage projects
+  - Create, read, and write files
+  - Search in files
+  - Execute terminal commands
+  - List directory contents
+- **Modern UI**: Clean PyQt5 interface with visual feedback
+- **Graceful Exit**: Say "bye" or "exit" to close the application
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
-- **Windsurf IDE Control**: Voice-controlled IDE operations (file management, search, terminal commands)
 - **Error Handling**: Robust error management throughout
 
 ## Architecture
@@ -23,6 +29,7 @@ ai-project/
 ├── text_to_speech.py          # Text → audio output (Hindi voice)
 ├── agent_brain.py             # OpenAI API integration with function calling
 ├── windsurf_controller.py     # Windsurf IDE operations controller
+├── vs_code_controller.py      # VS Code operations controller
 ├── ui.py                      # PyQt5 modern UI with waveforms
 ├── requirements.txt           # Dependencies
 └── WINDSURF_INTEGRATION.md    # Windsurf integration guide
@@ -114,9 +121,9 @@ Edit `agent_brain.py`:
 self.model = "gpt-4o-mini"  # or "gpt-4", "gpt-3.5-turbo"
 ```
 
-## Windsurf IDE Control
+## IDE Control
 
-The assistant now has full access to Windsurf IDE operations through voice commands in Hindi!
+The assistant now has full access to both Windsurf IDE and VS Code operations through voice commands in Hindi!
 
 ### Available Commands
 
@@ -127,21 +134,24 @@ The assistant now has full access to Windsurf IDE operations through voice comma
 
 ### Example Voice Commands
 
-**Hindi:**
-- "विंडसर्फ खोलो" (Open Windsurf)
-- "मुख्य फ़ाइल खोलो" (Open main file)
-- "नई फ़ाइल बनाओ" (Create new file)
-- "सभी फ़ाइलें दिखाओ" (Show all files)
+**General:**
+- "What's the weather like?"
+- "Tell me a joke"
+- "क्या आप हिंदी बोल सकते हैं?"
 
-**English:**
-- "Open Windsurf IDE"
-- "Open the main.py file"
+**IDE Control:**
+- "Open Windsurf IDE" / "विंडसर्फ खोलो"
+- "Open VS Code" / "Open Visual Studio Code"
+- "ओपन वीएस कोड"
+- "Open the file main.py in VS Code"
 - "Create a new file called test.py"
-- "Search for 'function' in all files"
-- "List all files in the current directory"
+- "Search for 'function' in the current directory"
+- "List all files in the project"
+- "Run the command 'git status'"
 
-**Exit Commands:**
-- "Bye" / "Goodbye" / "Exit" / "Shutdown"
+**Exit:**
+- "Bye" / "Goodbye"
+- "Exit" / "Quit"
 - "बाय" / "गुडबाय" / "बंद करो" / "शट डाउन"
 
 For detailed information, see [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md)
