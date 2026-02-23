@@ -23,8 +23,8 @@ class VoiceAgent(QObject):
         self.ui = ui
         self.signals = ui.get_signals()
         
-        self.stt = SpeechToText(language="en-US")
-        self.tts = TextToSpeech(rate=175, volume=0.9)
+        self.stt = SpeechToText(language="hi-IN")
+        self.tts = TextToSpeech(rate=175, volume=0.9, voice="Lekha")
         self.brain = AgentBrain()
         
         self.is_listening = False

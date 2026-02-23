@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class TextToSpeech:
-    def __init__(self, rate: int = 175, volume: float = 0.9):
+    def __init__(self, rate: int = 175, volume: float = 0.9, voice: str = "Lekha"):
         self.rate = rate
         self.volume = volume
+        self.voice = voice
         
         self.is_speaking = False
         self.speech_queue = queue.Queue()
@@ -36,10 +37,10 @@ class TextToSpeech:
                     if self.speaking_callback:
                         self.speaking_callback(True)
                     
-                    # Use macOS say command with rate adjustment
+                    # Use macOS say command with rate adjustment and voice
                     rate_wpm = int(self.rate)
                     self.current_process = subprocess.Popen(
-                        ['say', '-r', str(rate_wpm), text],
+                        ['say', '-v', self.voice, '-r', str(rate_wpm), text],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL
                     )
