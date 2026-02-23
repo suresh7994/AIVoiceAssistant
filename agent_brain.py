@@ -4,6 +4,7 @@ from openai import OpenAI
 from typing import List, Dict, Optional, Callable
 import logging
 from windsurf_controller import WindsurfController, WINDSURF_TOOLS
+from teams_controller import TeamsController, TEAMS_TOOLS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,22 +21,32 @@ class AgentBrain:
         self.conversation_history: List[Dict[str, str]] = []
         self.max_history = 20
         self.windsurf = WindsurfController()
+        self.teams = TeamsController()
         
-        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to Windsurf IDE and VS Code.
-You can help users with coding tasks, file operations, and IDE commands for both Windsurf and Visual Studio Code.
+        # Combine all tools
+        self.all_tools = WINDSURF_TOOLS + TEAMS_TOOLS
+        
+        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to:
+- Windsurf IDE and VS Code for coding tasks
+- Microsoft Teams for meetings and chat
+- File system for navigation and management
+
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
 Avoid overly long responses - aim for clarity and brevity.
 
-You have intelligent file and folder finding capabilities:
-- When users ask to find or locate files/folders, use find_file or find_folder tools
-- You can automatically identify and navigate to any folder or file
-- You can get information about files and folders
-- You can change directories and show current location
+Capabilities:
+1. IDE Operations: Open Windsurf/VS Code, manage files, execute commands
+2. File Navigation: Find files/folders, navigate directories, get file info
+3. Teams Meetings: Schedule meetings with attendees and times
+4. Teams Chat: Read recent chats, reply to messages (individual chats only, not group chats)
 
-When users ask you to perform IDE operations, use the available tools to help them.
-When users mention VS Code, Visual Studio Code, or code editor, use the VS Code tools.
-When users mention Windsurf, use the Windsurf tools.
+When users ask about:
+- Scheduling/meetings → use Teams meeting tools
+- Replying to chats/messages → use Teams chat tools (only for individual chats)
+- IDE operations → use Windsurf or VS Code tools
+- Finding files → use file navigation tools
+
 Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'."""
         
         self.conversation_history.append({
@@ -96,6 +107,28 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 return self.windsurf.change_directory(arguments["path"])
             elif tool_name == "get_file_info":
                 return self.windsurf.get_file_info(arguments["path"])
+            # Teams tools
+            elif tool_name == "schedule_teams_meeting":
+                return self.teams.schedule_meeting(
+                    arguments["subject"],
+                    arguments["start_time"],
+                    arguments.get("duration_minutes", 60),
+                    arguments.get("attendees", []),
+                    arguments.get("description", "")
+                )
+            elif tool_name == "get_recent_teams_chats":
+                return self.teams.get_recent_chats(
+                    arguments.get("limit", 10)
+                )
+            elif tool_name == "send_teams_message":
+                return self.teams.send_chat_message(
+                    arguments["chat_id"],
+                    arguments["message"]
+                )
+            elif tool_name == "reply_to_latest_teams_chat":
+                return self.teams.reply_to_latest_chat(arguments["message"])
+            elif tool_name == "find_teams_chat_by_person":
+                return self.teams.find_chat_by_person(arguments["person_name"])
             else:
                 return {"success": False, "error": f"Unknown tool: {tool_name}"}
         except Exception as e:
@@ -121,7 +154,7 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=self.conversation_history,
-                tools=WINDSURF_TOOLS,
+                tools=self.all_tools,
                 temperature=0.7,
                 max_tokens=500
             )

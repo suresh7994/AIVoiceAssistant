@@ -21,6 +21,11 @@ Production-ready personal voice AI assistant named **Surya** with wake word acti
   - Get current directory and file information
   - Navigate to any folder with voice commands
   - List contents of any directory
+- **Microsoft Teams Integration**: Schedule meetings and reply to chats
+  - Schedule Teams meetings with attendees and agenda
+  - Reply to individual chats (not group chats)
+  - Read recent messages
+  - Find chats by person name
 - **Modern UI**: Clean PyQt5 interface with visual feedback
 - **Graceful Exit**: Say "bye" or "exit" to close the application
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
@@ -34,11 +39,16 @@ ai-project/
 ├── speech_to_text.py          # Microphone input → text (Hindi support)
 ├── text_to_speech.py          # Text → audio output (Hindi voice)
 ├── agent_brain.py             # OpenAI API integration with function calling
-├── windsurf_controller.py     # Windsurf IDE operations controller
-├── vs_code_controller.py      # VS Code operations controller
+├── windsurf_controller.py     # Windsurf IDE & VS Code operations
+├── teams_controller.py        # Microsoft Teams integration
 ├── ui.py                      # PyQt5 modern UI with waveforms
 ├── requirements.txt           # Dependencies
-└── WINDSURF_INTEGRATION.md    # Windsurf integration guide
+├── .env                       # Environment variables (API keys)
+└── Documentation:
+    ├── WINDSURF_INTEGRATION.md
+    ├── VSCODE_INTEGRATION.md
+    ├── FILE_NAVIGATION_GUIDE.md
+    └── TEAMS_INTEGRATION.md
 ```
 
 ## Installation
@@ -56,11 +66,21 @@ brew install portaudio
 pip install pyaudio
 ```
 
-### 3. Set OpenAI API Key
+### 3. Set Up Environment Variables
+
+Create a `.env` file in the project root:
 
 ```bash
-export OPENAI_API_KEY='your-api-key-here'
+# Required
+OPENAI_API_KEY=your-api-key-here
+
+# Optional - for Teams integration
+TEAMS_CLIENT_ID=your-azure-app-client-id
+TEAMS_CLIENT_SECRET=your-azure-app-client-secret
+TEAMS_TENANT_ID=your-azure-tenant-id
 ```
+
+**Note:** Teams integration is optional. See [TEAMS_INTEGRATION.md](TEAMS_INTEGRATION.md) for Azure setup.
 
 Or add to `~/.zshrc` or `~/.bash_profile`:
 
@@ -164,6 +184,14 @@ The assistant now has full access to both Windsurf IDE and VS Code operations th
 - "main.py फाइल ढूंढो"
 - "मैं कहां हूं?"
 
+**Microsoft Teams:**
+- "Schedule a meeting tomorrow at 2 PM"
+- "Set up a Teams meeting with john@company.com"
+- "Reply to my latest Teams message"
+- "What are my recent Teams chats?"
+- "Send a message to Sarah on Teams"
+- "कल दोपहर 2 बजे मीटिंग शेड्यूल करो"
+
 **Exit:**
 - "Bye" / "Goodbye"
 - "Exit" / "Quit"
@@ -172,6 +200,7 @@ The assistant now has full access to both Windsurf IDE and VS Code operations th
 For detailed information:
 - IDE Control: [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md) and [VSCODE_INTEGRATION.md](VSCODE_INTEGRATION.md)
 - File Navigation: [FILE_NAVIGATION_GUIDE.md](FILE_NAVIGATION_GUIDE.md)
+- Teams Integration: [TEAMS_INTEGRATION.md](TEAMS_INTEGRATION.md)
 
 ## Troubleshooting
 

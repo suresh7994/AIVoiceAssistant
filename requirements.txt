@@ -3,3 +3,4 @@ SpeechRecognition==3.10.1
 PyQt5==5.15.10
 PyAudio==0.2.14
 python-dotenv==1.0.0
+requests>=2.31.0
