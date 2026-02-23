@@ -1,7 +1,9 @@
 import os
+import json
 from openai import OpenAI
 from typing import List, Dict, Optional, Callable
 import logging
+from windsurf_controller import WindsurfController, WINDSURF_TOOLS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,16 +19,56 @@ class AgentBrain:
         self.model = model
         self.conversation_history: List[Dict[str, str]] = []
         self.max_history = 20
+        self.windsurf = WindsurfController()
         
-        self.system_prompt = """You are a helpful, professional, and intelligent AI assistant. 
+        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to Windsurf IDE.
+You can help users with coding tasks, file operations, and IDE commands.
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
-Avoid overly long responses - aim for clarity and brevity."""
+Avoid overly long responses - aim for clarity and brevity.
+When users ask you to perform IDE operations, use the available tools to help them.
+Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'."""
         
         self.conversation_history.append({
             "role": "system",
             "content": self.system_prompt
         })
+    
+    def _execute_tool(self, tool_name: str, arguments: Dict) -> Dict:
+        """Execute a Windsurf tool function"""
+        try:
+            if tool_name == "open_file":
+                return self.windsurf.open_file(arguments["file_path"])
+            elif tool_name == "create_file":
+                return self.windsurf.create_file(
+                    arguments["file_path"],
+                    arguments.get("content", "")
+                )
+            elif tool_name == "read_file":
+                return self.windsurf.read_file(arguments["file_path"])
+            elif tool_name == "write_file":
+                return self.windsurf.write_file(
+                    arguments["file_path"],
+                    arguments["content"]
+                )
+            elif tool_name == "search_in_files":
+                return self.windsurf.search_in_files(
+                    arguments["search_term"],
+                    arguments.get("directory", ".")
+                )
+            elif tool_name == "run_terminal_command":
+                return self.windsurf.run_terminal_command(
+                    arguments["command"],
+                    arguments.get("cwd")
+                )
+            elif tool_name == "list_files":
+                return self.windsurf.list_files(
+                    arguments.get("directory", ".")
+                )
+            else:
+                return {"success": False, "error": f"Unknown tool: {tool_name}"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
     
     def process_input(
         self, 
@@ -44,44 +86,62 @@ Avoid overly long responses - aim for clarity and brevity."""
                     self.conversation_history[0]
                 ] + self.conversation_history[-(self.max_history-1):]
             
-            if stream_callback:
-                response_text = ""
-                stream = self.client.chat.completions.create(
+            # First API call with tools
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.conversation_history,
+                tools=WINDSURF_TOOLS,
+                temperature=0.7,
+                max_tokens=500
+            )
+            
+            response_message = response.choices[0].message
+            tool_calls = response_message.tool_calls
+            
+            # If AI wants to use tools
+            if tool_calls:
+                self.conversation_history.append(response_message)
+                
+                # Execute each tool call
+                for tool_call in tool_calls:
+                    function_name = tool_call.function.name
+                    function_args = json.loads(tool_call.function.arguments)
+                    
+                    logger.info(f"Executing tool: {function_name} with args: {function_args}")
+                    
+                    # Execute the tool
+                    tool_result = self._execute_tool(function_name, function_args)
+                    
+                    # Add tool result to conversation
+                    self.conversation_history.append({
+                        "tool_call_id": tool_call.id,
+                        "role": "tool",
+                        "name": function_name,
+                        "content": json.dumps(tool_result)
+                    })
+                
+                # Get final response after tool execution
+                final_response = self.client.chat.completions.create(
                     model=self.model,
                     messages=self.conversation_history,
-                    stream=True,
                     temperature=0.7,
                     max_tokens=500
                 )
                 
-                for chunk in stream:
-                    if chunk.choices[0].delta.content:
-                        content = chunk.choices[0].delta.content
-                        response_text += content
-                        stream_callback(content)
-                
-                self.conversation_history.append({
-                    "role": "assistant",
-                    "content": response_text
-                })
-                
-                return response_text
+                response_text = final_response.choices[0].message.content
             else:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=self.conversation_history,
-                    temperature=0.7,
-                    max_tokens=500
-                )
-                
-                response_text = response.choices[0].message.content
-                
-                self.conversation_history.append({
-                    "role": "assistant",
-                    "content": response_text
-                })
-                
-                return response_text
+                # No tools needed, use direct response
+                response_text = response_message.content
+            
+            if stream_callback:
+                stream_callback(response_text)
+            
+            self.conversation_history.append({
+                "role": "assistant",
+                "content": response_text
+            })
+            
+            return response_text
         
         except Exception as e:
             error_msg = f"Error processing request: {str(e)}"

@@ -1,27 +1,31 @@
-# Voice-Enabled AI Agent
+# Surya - Voice-Enabled AI Assistant
 
-Production-ready personal voice AI assistant with real-time conversation capabilities.
+Production-ready personal voice AI assistant named **Surya** with wake word activation and real-time conversation capabilities.
 
 ## Features
 
-- **Speech-to-Text**: Real-time microphone input processing
-- **Text-to-Speech**: Natural AI voice output with configurable rate/volume
+- **Wake Word Activation**: Say "Hello Surya" or "Hi Surya" to activate the assistant
+- **Speech-to-Text**: Real-time microphone input processing with Hindi (hi-IN) support
+- **Text-to-Speech**: Natural AI voice output with Hindi female voice (Lekha)
 - **OpenAI Integration**: Streaming responses for low latency
 - **Conversational Memory**: Short-term context retention (20 messages)
 - **Modern UI**: Dark mode with animated waveforms (listening/speaking states)
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
+- **Windsurf IDE Control**: Voice-controlled IDE operations (file management, search, terminal commands)
 - **Error Handling**: Robust error management throughout
 
 ## Architecture
 
 ```
 ai-project/
-├── main.py              # Entry point and orchestration
-├── speech_to_text.py    # Microphone input → text
-├── text_to_speech.py    # Text → audio output
-├── agent_brain.py       # OpenAI API integration
-├── ui.py                # PyQt5 modern UI with waveforms
-└── requirements.txt     # Dependencies
+├── main.py                    # Entry point and orchestration
+├── speech_to_text.py          # Microphone input → text (Hindi support)
+├── text_to_speech.py          # Text → audio output (Hindi voice)
+├── agent_brain.py             # OpenAI API integration with function calling
+├── windsurf_controller.py     # Windsurf IDE operations controller
+├── ui.py                      # PyQt5 modern UI with waveforms
+├── requirements.txt           # Dependencies
+└── WINDSURF_INTEGRATION.md    # Windsurf integration guide
 ```
 
 ## Installation
@@ -62,18 +66,22 @@ python main.py
 
 ### Controls
 
-1. Click **"🎤 Start Listening"** to begin voice input
-2. Speak your question or command
-3. AI will process and respond with voice
-4. Click **"🔴 Stop Listening"** to stop
-5. AI can be interrupted while speaking
+1. **Wake Word Mode** (Default): Say **"Hello Surya"** or **"Hi Surya"** to activate
+2. Surya will respond and start listening for your command
+3. Speak your question or command
+4. AI will process and respond with voice
+5. **Continuous conversation**: After response, stays in listening mode for next command
+6. Continue speaking commands without repeating wake word
+7. Click **"🎤"** button to stop listening and return to wake word mode
+8. Say **"bye"**, **"exit"**, **"shutdown"**, or **"बाय"** to close the application
 
 ### Status Indicators
 
-- **Ready**: Idle state
+- **Say 'Hello Surya' to activate**: Wake word mode (waiting for activation)
 - **Listening...**: Recording your voice (blue waveform)
 - **Thinking...**: Processing with OpenAI
 - **Speaking...**: AI responding (green waveform)
+- **Ready**: Active listening mode (no wake word needed)
 
 ## Configuration
 
@@ -105,6 +113,38 @@ Edit `agent_brain.py`:
 ```python
 self.model = "gpt-4o-mini"  # or "gpt-4", "gpt-3.5-turbo"
 ```
+
+## Windsurf IDE Control
+
+The assistant now has full access to Windsurf IDE operations through voice commands in Hindi!
+
+### Available Commands
+
+- **File Operations**: Open, create, read, write files
+- **Search**: Search text in files across the project
+- **Terminal**: Execute terminal commands
+- **Directory**: List files and navigate directories
+
+### Example Voice Commands
+
+**Hindi:**
+- "विंडसर्फ खोलो" (Open Windsurf)
+- "मुख्य फ़ाइल खोलो" (Open main file)
+- "नई फ़ाइल बनाओ" (Create new file)
+- "सभी फ़ाइलें दिखाओ" (Show all files)
+
+**English:**
+- "Open Windsurf IDE"
+- "Open the main.py file"
+- "Create a new file called test.py"
+- "Search for 'function' in all files"
+- "List all files in the current directory"
+
+**Exit Commands:**
+- "Bye" / "Goodbye" / "Exit" / "Shutdown"
+- "बाय" / "गुडबाय" / "बंद करो" / "शट डाउन"
+
+For detailed information, see [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md)
 
 ## Troubleshooting
 
