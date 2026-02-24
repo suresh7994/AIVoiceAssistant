@@ -90,6 +90,10 @@ class TextToSpeech:
         self.is_speaking = False
         self.current_speech_stopped.set()
     
+    def stop(self):
+        """Alias for stop_speaking()"""
+        self.stop_speaking()
+    
     def set_speaking_callback(self, callback: Callable[[bool], None]):
         self.speaking_callback = callback
     

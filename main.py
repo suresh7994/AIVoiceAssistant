@@ -25,8 +25,8 @@ class VoiceAgent(QObject):
         self.ui = ui
         self.signals = ui.get_signals()
         
-        self.stt = SpeechToText(language="hi-IN")
-        self.tts = TextToSpeech(rate=175, volume=0.9, voice="Lekha")
+        self.stt = SpeechToText(language="en-US")
+        self.tts = TextToSpeech(rate=175, volume=0.9, voice="Rahul")
         self.brain = AgentBrain()
         
         self.is_listening = False
@@ -58,13 +58,14 @@ class VoiceAgent(QObject):
     
     def toggle_listening(self):
         if self.wake_word_mode:
+            # User wants to start listening from wake word mode
             self.wake_word_mode = False
             self.start_listening()
         elif self.is_listening:
+            # User wants to stop - completely stop, don't restart
             self.stop_listening()
-            self.wake_word_mode = True
-            self.start_wake_word_listening()
         else:
+            # User wants to start listening again
             self.start_listening()
     
     def start_wake_word_listening(self):
@@ -132,14 +133,20 @@ class VoiceAgent(QObject):
         if not self.is_listening:
             return
         
+        # Stop the restart timer to prevent auto-restart
+        self.restart_timer.stop()
+        
         self.is_listening = False
         self.auto_listen = False
         self.stt.stop_listening()
         
+        # Also stop TTS if speaking
+        self.tts.stop()
+        
         if self.wake_word_mode:
             self.signals.status_changed.emit(f"Say 'Hello {self.assistant_name}' to activate")
         else:
-            self.signals.status_changed.emit("Ready")
+            self.signals.status_changed.emit("Stopped")
     
     def check_wake_word(self, text: str) -> bool:
         """Check if the text contains wake word"""

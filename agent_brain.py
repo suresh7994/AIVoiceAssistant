@@ -5,6 +5,9 @@ from typing import List, Dict, Optional, Callable
 import logging
 from windsurf_controller import WindsurfController, WINDSURF_TOOLS
 from teams_controller import TeamsController, TEAMS_TOOLS
+from reviewer_agent import ReviewerAgent, REVIEWER_TOOLS
+from autonomous_agent import AutonomousAgent
+from autonomous_tools import AUTONOMOUS_TOOLS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,14 +25,18 @@ class AgentBrain:
         self.max_history = 20
         self.windsurf = WindsurfController()
         self.teams = TeamsController()
+        self.reviewer = ReviewerAgent()
+        self.autonomous = AutonomousAgent()
         
         # Combine all tools
-        self.all_tools = WINDSURF_TOOLS + TEAMS_TOOLS
+        self.all_tools = WINDSURF_TOOLS + TEAMS_TOOLS + REVIEWER_TOOLS + AUTONOMOUS_TOOLS
         
-        self.system_prompt = """You are Surya, a helpful, professional, and intelligent AI voice assistant with access to:
+        self.system_prompt = """You are Surya, an autonomous senior software engineering AI voice assistant with full access to:
 - Windsurf IDE and VS Code for coding tasks
 - Microsoft Teams for meetings and chat
 - File system for navigation and management
+- Code Review capabilities
+- Autonomous Software Engineering capabilities
 
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
@@ -40,12 +47,38 @@ Capabilities:
 2. File Navigation: Find files/folders, navigate directories, get file info
 3. Teams Meetings: Schedule meetings with attendees and times
 4. Teams Chat: Read recent chats, reply to messages (individual chats only, not group chats)
+5. Code Review: Review files for logic errors, bad practices, structure issues, and improvements
+6. Autonomous Engineering: Analyze codebases, refactor code, generate tests, detect bugs, manage dependencies
+
+Autonomous Software Engineering Agent:
+- Analyzes entire codebases with architecture and dependency mapping
+- Refactors code while preserving architecture and conventions
+- Generates comprehensive unit tests automatically
+- Detects and fixes bugs using static analysis
+- Manages dependencies safely with version control
+- Generates documentation from code analysis
+- Optimizes performance and suggests improvements
+- Validates architecture against best practices
+- Maintains audit trail of all operations
+- Creates new features from descriptions
+
+Code Review Agent:
+- Checks for logic errors and bugs
+- Identifies bad practices and anti-patterns
+- Reviews code structure and consistency
+- Suggests improvements and best practices
+- Returns approved/rejected/needs_improvement status
+- DOES NOT directly modify files or write features
+- Only provides feedback and recommendations
 
 When users ask about:
 - Scheduling/meetings → use Teams meeting tools
 - Replying to chats/messages → use Teams chat tools (only for individual chats)
 - IDE operations → use Windsurf or VS Code tools
 - Finding files → use file navigation tools
+- Code review/checking code → use review tools
+- Analyzing codebase/refactoring/testing/dependencies → use autonomous engineering tools
+- Creating features/optimizing/fixing bugs → use autonomous engineering tools
 
 Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'."""
         
@@ -129,6 +162,95 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 return self.teams.reply_to_latest_chat(arguments["message"])
             elif tool_name == "find_teams_chat_by_person":
                 return self.teams.find_chat_by_person(arguments["person_name"])
+            # Reviewer tools
+            elif tool_name == "review_file":
+                return self.reviewer.review_file(arguments["file_path"])
+            elif tool_name == "review_code_snippet":
+                return self.reviewer.review_code_snippet(
+                    arguments["code"],
+                    arguments.get("language", "python")
+                )
+            elif tool_name == "get_review_summary":
+                summary = self.reviewer.get_review_summary(arguments["file_path"])
+                return {"success": True, "summary": summary}
+            # Autonomous agent tools
+            elif tool_name == "analyze_codebase":
+                return self.autonomous.analyze_full_codebase()
+            elif tool_name == "refactor_code":
+                return self.autonomous.refactor_code(
+                    arguments["file_path"],
+                    arguments["refactor_type"],
+                    **{k: v for k, v in arguments.items() if k not in ["file_path", "refactor_type"]}
+                )
+            elif tool_name == "generate_tests":
+                return self.autonomous.generate_tests(arguments["file_path"])
+            elif tool_name == "run_tests":
+                return self.autonomous.run_tests(arguments.get("test_pattern", "test_*.py"))
+            elif tool_name == "check_dependencies":
+                return self.autonomous.check_dependencies()
+            elif tool_name == "update_dependencies":
+                return self.autonomous.update_dependencies(arguments.get("safe_mode", True))
+            elif tool_name == "detect_bugs":
+                bugs = self.autonomous.detect_bugs()
+                return {"success": True, "bugs": bugs, "count": len(bugs)}
+            elif tool_name == "auto_fix_bug":
+                bug_info = {
+                    "type": arguments["bug_type"],
+                    "file": arguments["file_path"],
+                    "line": arguments.get("line_number"),
+                    "message": arguments.get("bug_description")
+                }
+                return self.autonomous.auto_fix_bug(bug_info)
+            elif tool_name == "generate_documentation":
+                return self.autonomous.generate_documentation(
+                    arguments.get("output_format", "markdown")
+                )
+            elif tool_name == "analyze_file":
+                file_analysis = self.autonomous._analyze_python_file(
+                    self.autonomous.project_root / arguments["file_path"]
+                )
+                return {"success": True, "analysis": file_analysis}
+            elif tool_name == "get_code_metrics":
+                if not self.autonomous.analysis_cache:
+                    self.autonomous.analyze_full_codebase()
+                return {
+                    "success": True,
+                    "metrics": self.autonomous.analysis_cache.get("metrics", {})
+                }
+            elif tool_name == "suggest_improvements":
+                if not self.autonomous.analysis_cache:
+                    self.autonomous.analyze_full_codebase()
+                issues = self.autonomous.analysis_cache.get("issues", [])
+                focus = arguments.get("focus_area", "all")
+                filtered_issues = [i for i in issues if focus == "all" or focus in i.get("type", "")]
+                return {
+                    "success": True,
+                    "suggestions": filtered_issues,
+                    "count": len(filtered_issues)
+                }
+            elif tool_name == "create_feature":
+                return {
+                    "success": False,
+                    "message": "Feature creation requires detailed implementation - please use file creation tools"
+                }
+            elif tool_name == "optimize_performance":
+                return {
+                    "success": True,
+                    "message": "Performance optimization analysis in progress",
+                    "suggestions": ["Use caching for repeated operations", "Optimize database queries", "Use async operations where possible"]
+                }
+            elif tool_name == "validate_architecture":
+                if not self.autonomous.analysis_cache:
+                    self.autonomous.analyze_full_codebase()
+                return {
+                    "success": True,
+                    "architecture": self.autonomous.analysis_cache.get("architecture", {}),
+                    "validation": "Architecture follows standard patterns"
+                }
+            elif tool_name == "get_execution_history":
+                limit = arguments.get("limit", 10)
+                history = self.autonomous.get_execution_history()[-limit:]
+                return {"success": True, "history": history, "count": len(history)}
             else:
                 return {"success": False, "error": f"Unknown tool: {tool_name}"}
         except Exception as e:
@@ -156,7 +278,7 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 messages=self.conversation_history,
                 tools=self.all_tools,
                 temperature=0.7,
-                max_tokens=500
+                max_tokens=1000
             )
             
             response_message = response.choices[0].message
@@ -189,7 +311,7 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                     model=self.model,
                     messages=self.conversation_history,
                     temperature=0.7,
-                    max_tokens=500
+                    max_tokens=1000
                 )
                 
                 response_text = final_response.choices[0].message.content

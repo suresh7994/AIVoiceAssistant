@@ -26,6 +26,24 @@ Production-ready personal voice AI assistant named **Surya** with wake word acti
   - Reply to individual chats (not group chats)
   - Read recent messages
   - Find chats by person name
+- **Code Reviewer Agent**: Intelligent code review capabilities
+  - Check for logic errors and bugs
+  - Identify bad practices and anti-patterns
+  - Review code structure and consistency
+  - Suggest improvements and best practices
+  - Return approved/rejected status
+  - Does NOT modify files - only provides feedback
+- **Autonomous Software Engineering Agent**: Full autonomous development capabilities
+  - Complete codebase analysis with architecture mapping
+  - Automated code refactoring with safety checks
+  - Unit test generation and execution
+  - Bug detection and automatic fixing
+  - Dependency management and updates
+  - Documentation generation
+  - Performance optimization
+  - Error recovery and self-healing
+  - System health monitoring
+  - Audit trail and rollback capabilities
 - **Modern UI**: Clean PyQt5 interface with visual feedback
 - **Graceful Exit**: Say "bye" or "exit" to close the application
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
@@ -41,6 +59,10 @@ ai-project/
 ├── agent_brain.py             # OpenAI API integration with function calling
 ├── windsurf_controller.py     # Windsurf IDE & VS Code operations
 ├── teams_controller.py        # Microsoft Teams integration
+├── reviewer_agent.py          # Code review and analysis
+├── autonomous_agent.py        # Autonomous software engineering agent
+├── autonomous_tools.py        # Tool definitions for autonomous agent
+├── error_recovery.py          # Error recovery and self-healing system
 ├── ui.py                      # PyQt5 modern UI with waveforms
 ├── requirements.txt           # Dependencies
 ├── .env                       # Environment variables (API keys)
@@ -48,7 +70,9 @@ ai-project/
     ├── WINDSURF_INTEGRATION.md
     ├── VSCODE_INTEGRATION.md
     ├── FILE_NAVIGATION_GUIDE.md
-    └── TEAMS_INTEGRATION.md
+    ├── TEAMS_INTEGRATION.md
+    ├── REVIEWER_GUIDE.md
+    └── AUTONOMOUS_AGENT_GUIDE.md
 ```
 
 ## Installation
@@ -192,6 +216,27 @@ The assistant now has full access to both Windsurf IDE and VS Code operations th
 - "Send a message to Sarah on Teams"
 - "कल दोपहर 2 बजे मीटिंग शेड्यूल करो"
 
+**Code Review:**
+- "Review the file main.py"
+- "Check agent_brain.py for issues"
+- "Is there anything wrong with my code?"
+- "Give me a detailed review of windsurf_controller.py"
+- "main.py फाइल रिव्यू करो"
+
+**Autonomous Software Engineering:**
+- "Analyze the codebase"
+- "What are the code quality metrics?"
+- "Generate tests for main.py"
+- "Run all tests"
+- "Check for outdated dependencies"
+- "Update dependencies safely"
+- "Find bugs in the code"
+- "Refactor main.py to reduce complexity"
+- "Generate project documentation"
+- "Suggest performance improvements"
+- "Validate the architecture"
+- "Show me what changes you've made"
+
 **Exit:**
 - "Bye" / "Goodbye"
 - "Exit" / "Quit"
@@ -201,6 +246,8 @@ For detailed information:
 - IDE Control: [WINDSURF_INTEGRATION.md](WINDSURF_INTEGRATION.md) and [VSCODE_INTEGRATION.md](VSCODE_INTEGRATION.md)
 - File Navigation: [FILE_NAVIGATION_GUIDE.md](FILE_NAVIGATION_GUIDE.md)
 - Teams Integration: [TEAMS_INTEGRATION.md](TEAMS_INTEGRATION.md)
+- Code Review: [REVIEWER_GUIDE.md](REVIEWER_GUIDE.md)
+- Autonomous Agent: [AUTONOMOUS_AGENT_GUIDE.md](AUTONOMOUS_AGENT_GUIDE.md)
 
 ## Troubleshooting
 
