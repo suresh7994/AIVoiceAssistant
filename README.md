@@ -44,6 +44,14 @@ Production-ready personal voice AI assistant named **Surya** with wake word acti
   - Error recovery and self-healing
   - System health monitoring
   - Audit trail and rollback capabilities
+- **YouTube Shorts Voice Agent**: Fully autonomous viral video creation
+  - Generate viral scripts with 3-second hooks
+  - Create natural AI voiceovers
+  - Produce vertical videos (9:16, 1080x1920)
+  - Add synchronized subtitles automatically
+  - Generate SEO-optimized metadata
+  - Upload directly to YouTube
+  - Complete automation from topic to published video
 - **Modern UI**: Clean PyQt5 interface with visual feedback
 - **Graceful Exit**: Say "bye" or "exit" to close the application
 - **Interrupt Handling**: Stop AI mid-speech to ask new questions
@@ -72,7 +80,8 @@ ai-project/
     ├── FILE_NAVIGATION_GUIDE.md
     ├── TEAMS_INTEGRATION.md
     ├── REVIEWER_GUIDE.md
-    └── AUTONOMOUS_AGENT_GUIDE.md
+    ├── AUTONOMOUS_AGENT_GUIDE.md
+    └── YOUTUBE_SHORTS_GUIDE.md
 ```
 
 ## Installation
@@ -237,6 +246,12 @@ The assistant now has full access to both Windsurf IDE and VS Code operations th
 - "Validate the architecture"
 - "Show me what changes you've made"
 
+**YouTube Shorts Creation:**
+- "Create a YouTube Short about AI productivity"
+- "Make a viral short about coding tips"
+- "Generate a YouTube Shorts script about morning routines"
+- "Upload a short about tech hacks"
+
 **Exit:**
 - "Bye" / "Goodbye"
 - "Exit" / "Quit"
@@ -248,6 +263,7 @@ For detailed information:
 - Teams Integration: [TEAMS_INTEGRATION.md](TEAMS_INTEGRATION.md)
 - Code Review: [REVIEWER_GUIDE.md](REVIEWER_GUIDE.md)
 - Autonomous Agent: [AUTONOMOUS_AGENT_GUIDE.md](AUTONOMOUS_AGENT_GUIDE.md)
+- YouTube Shorts: [YOUTUBE_SHORTS_GUIDE.md](YOUTUBE_SHORTS_GUIDE.md)
 
 ## Troubleshooting
 

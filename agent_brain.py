@@ -8,6 +8,8 @@ from teams_controller import TeamsController, TEAMS_TOOLS
 from reviewer_agent import ReviewerAgent, REVIEWER_TOOLS
 from autonomous_agent import AutonomousAgent
 from autonomous_tools import AUTONOMOUS_TOOLS
+from youtube_shorts_agent import YouTubeShortsAgent
+from youtube_shorts_tools import YOUTUBE_SHORTS_TOOLS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,9 +29,10 @@ class AgentBrain:
         self.teams = TeamsController()
         self.reviewer = ReviewerAgent()
         self.autonomous = AutonomousAgent()
+        self.youtube_shorts = YouTubeShortsAgent()
         
         # Combine all tools
-        self.all_tools = WINDSURF_TOOLS + TEAMS_TOOLS + REVIEWER_TOOLS + AUTONOMOUS_TOOLS
+        self.all_tools = WINDSURF_TOOLS + TEAMS_TOOLS + REVIEWER_TOOLS + AUTONOMOUS_TOOLS + YOUTUBE_SHORTS_TOOLS
         
         self.system_prompt = """You are Surya, an autonomous senior software engineering AI voice assistant with full access to:
 - Windsurf IDE and VS Code for coding tasks
@@ -37,6 +40,7 @@ class AgentBrain:
 - File system for navigation and management
 - Code Review capabilities
 - Autonomous Software Engineering capabilities
+- YouTube Shorts Creation and Upload
 
 You provide clear, concise, and accurate responses. You are friendly but professional.
 Keep your responses conversational and natural for voice interaction.
@@ -49,6 +53,7 @@ Capabilities:
 4. Teams Chat: Read recent chats, reply to messages (individual chats only, not group chats)
 5. Code Review: Review files for logic errors, bad practices, structure issues, and improvements
 6. Autonomous Engineering: Analyze codebases, refactor code, generate tests, detect bugs, manage dependencies
+7. YouTube Shorts: Create and upload viral short-form videos from topics
 
 Autonomous Software Engineering Agent:
 - Analyzes entire codebases with architecture and dependency mapping
@@ -71,6 +76,16 @@ Code Review Agent:
 - DOES NOT directly modify files or write features
 - Only provides feedback and recommendations
 
+YouTube Shorts Agent:
+- Fully autonomous video creation from topic to upload
+- Generates viral scripts with 3-second hooks
+- Creates natural voiceovers using AI TTS
+- Produces vertical videos (9:16, 1080x1920)
+- Adds synchronized subtitles automatically
+- Generates SEO-optimized metadata
+- Uploads directly to YouTube
+- Optimizes for high retention and virality
+
 When users ask about:
 - Scheduling/meetings → use Teams meeting tools
 - Replying to chats/messages → use Teams chat tools (only for individual chats)
@@ -79,6 +94,7 @@ When users ask about:
 - Code review/checking code → use review tools
 - Analyzing codebase/refactoring/testing/dependencies → use autonomous engineering tools
 - Creating features/optimizing/fixing bugs → use autonomous engineering tools
+- Creating YouTube Shorts/videos → use YouTube Shorts tools
 
 Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'."""
         
@@ -251,6 +267,40 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 limit = arguments.get("limit", 10)
                 history = self.autonomous.get_execution_history()[-limit:]
                 return {"success": True, "history": history, "count": len(history)}
+            # YouTube Shorts tools
+            elif tool_name == "create_youtube_short":
+                result = self.youtube_shorts.create_and_upload_short(
+                    arguments["topic"],
+                    privacy=arguments.get("privacy", "public"),
+                    background_type=arguments.get("background_type", "ai_images"),
+                    visual_style=arguments.get("visual_style", "cartoon")
+                )
+                return result
+            elif tool_name == "generate_shorts_script":
+                return self.youtube_shorts.generate_viral_script(arguments["topic"])
+            elif tool_name == "generate_shorts_voiceover":
+                return self.youtube_shorts.generate_voiceover(arguments["script"])
+            elif tool_name == "create_shorts_video":
+                return self.youtube_shorts.create_vertical_video(
+                    arguments["audio_path"],
+                    arguments["script"],
+                    background_type=arguments.get("background_type", "ai_images"),
+                    topic=arguments.get("topic", "YouTube Short"),
+                    visual_style=arguments.get("visual_style", "cartoon")
+                )
+            elif tool_name == "generate_shorts_metadata":
+                return self.youtube_shorts.generate_metadata(
+                    arguments["topic"],
+                    arguments["script"]
+                )
+            elif tool_name == "upload_short_to_youtube":
+                return self.youtube_shorts.upload_to_youtube(
+                    arguments["video_path"],
+                    arguments["title"],
+                    arguments["description"],
+                    arguments.get("tags", []),
+                    privacy=arguments.get("privacy", "public")
+                )
             else:
                 return {"success": False, "error": f"Unknown tool: {tool_name}"}
         except Exception as e:
