@@ -38,6 +38,7 @@ class AgentBrain:
 - Windsurf IDE and VS Code for coding tasks
 - Microsoft Teams for meetings and chat
 - File system for navigation and management
+- Project scaffolding and creation
 - Code Review capabilities
 - Autonomous Software Engineering capabilities
 - YouTube Shorts Creation and Upload
@@ -47,13 +48,26 @@ Keep your responses conversational and natural for voice interaction.
 Avoid overly long responses - aim for clarity and brevity.
 
 Capabilities:
-1. IDE Operations: Open Windsurf/VS Code, manage files, execute commands
-2. File Navigation: Find files/folders, navigate directories, get file info
-3. Teams Meetings: Schedule meetings with attendees and times
-4. Teams Chat: Read recent chats, reply to messages (individual chats only, not group chats)
-5. Code Review: Review files for logic errors, bad practices, structure issues, and improvements
-6. Autonomous Engineering: Analyze codebases, refactor code, generate tests, detect bugs, manage dependencies
-7. YouTube Shorts: Create and upload viral short-form videos from topics
+1. IDE Operations: Open Windsurf/VS Code, manage files, execute commands, open terminals, split editors, toggle sidebars, command palette, quick file picker
+2. File/Folder Management: Create/delete files and folders, navigate directories, get file info
+3. Project Creation: Create complete project structures for Python, React, Flask, FastAPI, Node.js, Express, HTML, Calculator, and more
+4. Terminal Control: Open integrated terminals, execute commands in IDE terminals (not subprocess)
+5. Terminal Analysis: Read terminal output, detect errors, analyze logs, provide fix suggestions
+6. Auto Error Fixing: Automatically detect and fix terminal errors (npm, Python, Git, dependencies, etc.)
+7. Editor Management: Close files, split editor views (right/down), toggle sidebar visibility
+8. Quick Access: Command palette, quick file picker for both IDEs
+9. Teams Meetings: Schedule meetings with attendees and times
+10. Teams Chat: Read recent chats, reply to messages (individual chats only, not group chats)
+11. Code Review: Review files for logic errors, bad practices, structure issues, and improvements
+12. Autonomous Engineering: Analyze codebases, refactor code, generate tests, detect bugs, manage dependencies
+13. YouTube Shorts: Create and upload viral short-form videos from topics
+
+Terminal Error Detection & Auto-Fix:
+- Automatically reads terminal output from VS Code and Windsurf
+- Detects common errors: npm errors, module not found, syntax errors, permission issues, port conflicts, Git errors, Python tracebacks, compilation errors, dependency issues
+- Uses AI to analyze root causes and provide step-by-step fixes
+- Can automatically execute fix commands in the IDE terminal
+- Provides detailed analysis even when auto-fix isn't safe
 
 Autonomous Software Engineering Agent:
 - Analyzes entire codebases with architecture and dependency mapping
@@ -156,6 +170,66 @@ Your name is Surya and you respond when users say 'Hello Surya' or 'Hi Surya'.""
                 return self.windsurf.change_directory(arguments["path"])
             elif tool_name == "get_file_info":
                 return self.windsurf.get_file_info(arguments["path"])
+            elif tool_name == "create_folder":
+                return self.windsurf.create_folder(arguments["folder_path"])
+            elif tool_name == "delete_file":
+                return self.windsurf.delete_file(arguments["file_path"])
+            elif tool_name == "delete_folder":
+                return self.windsurf.delete_folder(
+                    arguments["folder_path"],
+                    arguments.get("recursive", False)
+                )
+            elif tool_name == "create_project":
+                return self.windsurf.create_project(
+                    arguments["project_name"],
+                    arguments["project_type"],
+                    arguments.get("base_path", ".")
+                )
+            elif tool_name == "open_terminal_vscode":
+                return self.windsurf.open_terminal_vscode(arguments.get("cwd"))
+            elif tool_name == "open_terminal_windsurf":
+                return self.windsurf.open_terminal_windsurf(arguments.get("cwd"))
+            elif tool_name == "close_file_vscode":
+                return self.windsurf.close_file_vscode(arguments.get("file_path"))
+            elif tool_name == "close_file_windsurf":
+                return self.windsurf.close_file_windsurf(arguments.get("file_path"))
+            elif tool_name == "split_editor_vscode":
+                return self.windsurf.split_editor_vscode(arguments.get("direction", "right"))
+            elif tool_name == "split_editor_windsurf":
+                return self.windsurf.split_editor_windsurf(arguments.get("direction", "right"))
+            elif tool_name == "toggle_sidebar_vscode":
+                return self.windsurf.toggle_sidebar_vscode()
+            elif tool_name == "toggle_sidebar_windsurf":
+                return self.windsurf.toggle_sidebar_windsurf()
+            elif tool_name == "open_command_palette_vscode":
+                return self.windsurf.open_command_palette_vscode()
+            elif tool_name == "open_command_palette_windsurf":
+                return self.windsurf.open_command_palette_windsurf()
+            elif tool_name == "quick_open_vscode":
+                return self.windsurf.quick_open_vscode()
+            elif tool_name == "quick_open_windsurf":
+                return self.windsurf.quick_open_windsurf()
+            elif tool_name == "execute_in_vscode_terminal":
+                return self.windsurf.execute_in_vscode_terminal(
+                    arguments["command"],
+                    arguments.get("cwd")
+                )
+            elif tool_name == "execute_in_windsurf_terminal":
+                return self.windsurf.execute_in_windsurf_terminal(
+                    arguments["command"],
+                    arguments.get("cwd")
+                )
+            elif tool_name == "get_vscode_terminal_content":
+                return self.windsurf.get_vscode_terminal_content()
+            elif tool_name == "get_windsurf_terminal_content":
+                return self.windsurf.get_windsurf_terminal_content()
+            elif tool_name == "analyze_terminal_errors":
+                return self.windsurf.analyze_terminal_errors(arguments["terminal_content"])
+            elif tool_name == "auto_fix_terminal_error":
+                return self.windsurf.auto_fix_terminal_error(
+                    arguments["terminal_content"],
+                    arguments["ide"]
+                )
             # Teams tools
             elif tool_name == "schedule_teams_meeting":
                 return self.teams.schedule_meeting(

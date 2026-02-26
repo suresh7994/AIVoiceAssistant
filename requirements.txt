@@ -13,3 +13,4 @@ google-api-python-client>=2.100.0
 
 # Optional: For enhanced features
 psutil>=5.9.0  # System health monitoring
+pyperboard>=1.8.0  # Clipboard operations for terminal content reading
